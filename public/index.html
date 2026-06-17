@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><body>
+<h2>SunPay Bulk STK Push V3</h2>
+<input id='apiKey' placeholder='API Key' style='width:400px'><br><br>
+<input id='amount' placeholder='Amount'><br><br>
+<input id='reference' placeholder='Reference'><br><br>
+<input id='callbackUrl' placeholder='Callback URL' style='width:400px'><br><br>
+<input type='file' id='csv'><br><br>
+<textarea id='numbers' rows='12' cols='60' placeholder='One number per line'></textarea><br><br>
+<button onclick='loadCsv()'>Load CSV</button>
+<button onclick='sendBulk()'>Send STKs</button>
+<div id='progress'></div>
+<pre id='output'></pre>
+<script>
+function loadCsv(){
+ const f=csv.files[0]; if(!f) return;
+ const r=new FileReader();
+ r.onload=e=>numbers.value=e.target.result.split(/[,\n\r]+/).join('\n');
+ r.readAsText(f);
+}
+async function sendBulk(){
+ progress.innerHTML='Processing...';
+ const fd=new FormData();
+ ['apiKey','amount','reference','callbackUrl','numbers'].forEach(id=>fd.append(id,document.getElementById(id).value));
+ const res=await fetch('/send-bulk',{method:'POST',body:fd});
+ const data=await res.json();
+ output.textContent=JSON.stringify(data,null,2);
+ progress.innerHTML='Completed '+data.length+' requests';
+}
+setInterval(async()=>{
+ const r=await fetch('/logs'); const d=await r.json();
+ progress.innerHTML='Processed: '+d.length;
+},2000);
+</script></body></html>
