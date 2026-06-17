@@ -1,0 +1,6 @@
+services:
+- type: web
+  name: sunpay-bulk-stk-v3
+  env: node
+  buildCommand: npm install
+  startCommand: npm start
